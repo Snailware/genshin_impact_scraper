@@ -39,7 +39,39 @@ class Scraper:
             print(f"received {weaponType} info in {request_delay} seconds.")
             
             parsed_page = BeautifulSoup(page.content, "html.parser")
+            tables = parsed_page.find_all("tbody")
+            rows = tables[1].find_all("tr")
+            for row in rows:
+                cells = row.find_all("td")
+                row_entry = []
+                for info in cells:
+                    entry = info.text.strip()
+                    if entry == "":
+                        row_entry.append("none")
+                    else:
+                        row_entry.append(entry)
+                if row_entry == []:
+                    pass
+                else:
+                    row_entry.append(weaponType)
+                    self.weapon_list.append(row_entry)
+    # scrape weapon info, format entries for list and remove garbage. 
+
+    def outputWeapons(self):
+        tsv_weapon_file = open("weapon_list.tsv", "w")
+        tsv_weapon_file.write("name\trarity\tbase atk\tsecondary stat\t" +
+        "passive\trank 1\trank 5\n")
+        for weapon in self.weapon_list:
+            tsv_weapon_file.write(f"{weapon[0]}\t{weapon[7]}\t{weapon[1]}" +
+            f"\t{weapon[2]}\t{weapon[3]}\t{weapon[4]}\t{weapon[5]}\t" +
+            f"{weapon[6]}\t{weapon[7]}\n")
+        tsv_weapon_file.close()
             
+
+
+
+
+
 
 
     # scrape weapons from weapon type pages. 
@@ -71,6 +103,7 @@ def main():
     scraper = Scraper("https://genshin-impact.fandom.com/wiki")
     scraper.scrapeTypes()
     scraper.scrapeWeapons()
+    scraper.outputWeapons()
 
 
 

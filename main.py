@@ -1,38 +1,51 @@
 
-# program will scrape genshin impact wiki for weapon info and create tsv file.
-
 import requests
 import time
 from bs4 import BeautifulSoup
 
-def main():
+class Scraper:
+# scraper object.
 
-    timer = VerboseTimer()
-    timer.start()
-    # create verbose timer object and begin timing. 
+    def __init__(self, url):
+        self.base_url = url
+        self.weapon_type_list = []
+        self.weapon_list = []
+    # initialize variables. 
 
-###############################################################################
+    def scrapeTypes(self):
+        page = requests.get(f"{self.base_url}/Weapons")
+        parsed_page = BeautifulSoup(page.content, "html.parser")
+        table = parsed_page.find(class_="article-table")
+        rough_list = table.find_all("td")
+        count = 0
+        for weapon in rough_list:
+            if count % 2 != 0:
+                pass
+            else:
+                entry = weapon.text
+                self.weapon_type_list.append(entry.strip())
+            count += 1
+    # scrape weapon types.
 
-    weapon_types = weaponTypeGetter()
-    # get weapon types list from weapon page.
+    def scrapeWeapons(self):
+        for weaponType in self.weapon_type_list:
 
-    weaponDataFill(weapon_types)
+            request_timer = Timer()
+            request_timer.start()
+            print(f"requesting {weaponType} information...")
 
-
-
-
-
-
-
-
-###############################################################################
-
-    timer.stop()
-    exit()
+            page = requests.get(f"{self.base_url}/{weaponType}")
+            request_delay = request_timer.stop()
+            print(f"received {weaponType} info in {request_delay} seconds.")
+            
+            parsed_page = BeautifulSoup(page.content, "html.parser")
+            
 
 
-class VerboseTimer:
-# timer object that will print output independantly.
+    # scrape weapons from weapon type pages. 
+
+class Timer:
+# timer object.
 
     def __init__(self):
         pass
@@ -40,69 +53,41 @@ class VerboseTimer:
 
     def start(self):
         self.start_time = time.time()
-        print("starting timer...")
-    # get starting time and print notification. 
+    # get starting time. 
 
     def stop(self):
         self.stop_time = time.time()
-        self.elapsed_time = self.stop_time - self.start_time
-        print("execution completed in approx {:.2f} seconds." \
-            .format(self.elapsed_time))
-    # get stop time, calculate elapsed time, then display. 
+        self.elapsed_time = float("{:.2f}".format(self.stop_time - 
+                                                    self.start_time))
+        return self.elapsed_time
+    # get stop time, calculate elapsed time, then return formatted value.
 
-    weapon_types = weaponTypeGetter()
-    # get weapon types list from weapon page.
-
-def weaponDataFill(weapon_types):
-
-    for weapon_type in weapon_types:
-
-        type_page = pageParser(weapon_type)
-        print(f"requesting {weapon_type} page...")
-
-        
+def main():
+    
+    timer = Timer()
+    timer.start()
+    print("starting scrape now...")
+    
+    scraper = Scraper("https://genshin-impact.fandom.com/wiki")
+    scraper.scrapeTypes()
+    scraper.scrapeWeapons()
 
 
 
+    elapsed_time = timer.stop()
+    print(f"execution finished successfully in approx {elapsed_time} seconds.")
 
-def weaponTypeGetter():
-# get weapon types and return list. 
 
-    type_list = []
-    # create list for types. 
 
-    weapon_page = pageParser("Weapons")
-    # navigate to weapons/table page for master weapon list. 
 
-    type_table = weapon_page.find(class_="article-table")
-    rough_list = type_table.find_all("td")
-    # navigate to table and find all entries.
 
-    count = 0
-    for weapon in rough_list:
-        if count % 2 != 0:
-            pass
-        else:
-            entry = weapon.text
-            type_list.append(entry.strip())
-        count += 1
-    # iterate through data, only adding every other entry.
 
-    return type_list
-    # return list.
 
-def pageParser(page_url):
-# encode url, request page, parse results, then return object.
 
-    requestTimer = VerboseTimer
-    base_url = "https://genshin-impact.fandom.com/wiki"
-    new_url = f"{base_url}/{page_url}"
-    # combine and encode base and page url.
 
-    page = requests.get(new_url)
-    parsed_page = BeautifulSoup(page.content, "html.parser")
-    return parsed_page
-    # request page from created url, parse object with html parser and return
-    # parsed page object. 
+
+    
+
+
 
 main()

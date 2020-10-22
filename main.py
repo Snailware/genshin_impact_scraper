@@ -47,34 +47,24 @@ class Scraper:
                 for info in cells:
                     entry = info.text.strip()
                     if entry == "":
-                        row_entry.append("none")
+                        row_entry.append("None")
                     else:
-                        row_entry.append(entry)
-                if row_entry == []:
-                    pass
-                else:
+                        row_entry.append(entry.replace("\n", " "))
+                if row_entry != []:
                     row_entry.append(weaponType)
                     self.weapon_list.append(row_entry)
-    # scrape weapon info, format entries for list and remove garbage. 
+    # scrape weapon info, format entries for list and remove junk. 
 
     def outputWeapons(self):
-        tsv_weapon_file = open("weapon_list.tsv", "w")
-        tsv_weapon_file.write("name\trarity\tbase atk\tsecondary stat\t" +
-        "passive\trank 1\trank 5\n")
+        tsv_weapon_file = open("weapon_list.tsv", "a")
+        tsv_weapon_file.write("name\tweapon type\trarity\tbase attack\t" +
+        "2nd stat\tpassive\trank 1\trank 5\n")
         for weapon in self.weapon_list:
-            tsv_weapon_file.write(f"{weapon[0]}\t{weapon[7]}\t{weapon[1]}" +
-            f"\t{weapon[2]}\t{weapon[3]}\t{weapon[4]}\t{weapon[5]}\t" +
-            f"{weapon[6]}\t{weapon[7]}\n")
+            tsv_weapon_file.write(f"{weapon[0]}\t{weapon[8]}\t{weapon[2]}"+
+            f"\t{weapon[3]}\t{weapon[4]}\t{weapon[5]}\t{weapon[6]}\t" +
+            f"{weapon[7]}\n")
         tsv_weapon_file.close()
-            
-
-
-
-
-
-
-
-    # scrape weapons from weapon type pages. 
+    # write table TSV file for viewing / export.
 
 class Timer:
 # timer object.
@@ -99,28 +89,16 @@ def main():
     timer = Timer()
     timer.start()
     print("starting scrape now...")
+    # start timer and alert user. 
     
     scraper = Scraper("https://genshin-impact.fandom.com/wiki")
     scraper.scrapeTypes()
     scraper.scrapeWeapons()
     scraper.outputWeapons()
+    # scrape weapon information and output to TSV file. 
 
-
-
-    elapsed_time = timer.stop()
-    print(f"execution finished successfully in approx {elapsed_time} seconds.")
-
-
-
-
-
-
-
-
-
-
-    
-
-
+    print(f"execution finished successfully in approx {timer.stop()} seconds.")
+    exit()
+    # display total execution time then exit program. 
 
 main()

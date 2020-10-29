@@ -1,6 +1,6 @@
 
-import requests
-import time
+from requests import get
+from time import time
 from bs4 import BeautifulSoup
 
 class Scraper:
@@ -14,7 +14,7 @@ class Scraper:
     # initialize variables. 
 
     def scrapeTypes(self):
-        page = requests.get(f"{self.base_url}/Weapons")
+        page = get(f"{self.base_url}/Weapons")
         parsed_page = BeautifulSoup(page.content, "html.parser")
         table = parsed_page.find(class_="article-table")
         rough_list = table.find_all("td")
@@ -35,7 +35,7 @@ class Scraper:
             request_timer.start()
             print(f"requesting {weaponType} information...")
 
-            page = requests.get(f"{self.base_url}/{weaponType}")
+            page = get(f"{self.base_url}/{weaponType}")
             request_delay = request_timer.stop()
             print(f"received {weaponType} info in {request_delay} seconds.")
             
@@ -72,7 +72,7 @@ class Scraper:
         request_timer.start()
         print("requesting Character information...")
 
-        page = requests.get(f"{self.base_url}/Characters")
+        page = get(f"{self.base_url}/Characters")
         print(f"received Character info in approx {request_timer.stop()} seconds.")
 
         parsed_page = BeautifulSoup(page.content, "html.parser")
@@ -106,11 +106,11 @@ class Timer:
     # dont do anything on init.
 
     def start(self):
-        self.start_time = time.time()
+        self.start_time = time()
     # get starting time. 
 
     def stop(self):
-        self.stop_time = time.time()
+        self.stop_time = time()
         self.elapsed_time = float("{:.2f}".format(self.stop_time - 
                                                     self.start_time))
         return self.elapsed_time
